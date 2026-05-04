@@ -1,0 +1,246 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Digital Caretaker - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#e1e2e4",
+                        "secondary-container": "#c0d5ff",
+                        "on-primary-container": "#cadcff",
+                        "on-tertiary-fixed": "#341100",
+                        "surface-container-high": "#e7e8ea",
+                        "on-secondary-fixed-variant": "#324769",
+                        "primary-container": "#005fb8",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "primary": "#00488d",
+                        "inverse-on-surface": "#f0f1f3",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#d6e3ff",
+                        "tertiary-fixed-dim": "#ffb691",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#00468b",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#783100",
+                        "primary-fixed": "#d6e3ff",
+                        "primary-fixed-dim": "#a8c8ff",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c2c6d4",
+                        "surface": "#f8f9fb",
+                        "on-secondary-fixed": "#011b3c",
+                        "surface-tint": "#005db5",
+                        "on-surface-variant": "#424752",
+                        "on-secondary-container": "#475c7f",
+                        "secondary": "#4a5f83",
+                        "inverse-primary": "#a8c8ff",
+                        "outline": "#727783",
+                        "secondary-fixed-dim": "#b2c7f0",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#a04401",
+                        "inverse-surface": "#2e3132",
+                        "on-background": "#191c1e",
+                        "surface-container-low": "#f2f4f6",
+                        "background": "#f8f9fb",
+                        "surface-container-highest": "#e1e2e4",
+                        "surface-container": "#edeef0",
+                        "tertiary-fixed": "#ffdbcb",
+                        "surface-dim": "#d9dadc",
+                        "on-primary-fixed": "#001b3d",
+                        "tertiary": "#7b3200",
+                        "surface-bright": "#f8f9fb",
+                        "on-surface": "#191c1e",
+                        "on-tertiary-container": "#ffd1bc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "1rem",
+                        "xl": "1.25rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tap-highlight-none { -webkit-tap-highlight-color: transparent; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl flex items-center justify-between px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="clinical_notes" style="">clinical_notes</span>
+<h1 class="text-lg font-bold text-blue-900 dark:text-blue-100 font-manrope tracking-tight" style="">MediAlert</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border border-white/20">
+<img alt="User avatar" data-alt="close-up portrait of a professional individual with a friendly expression in a modern clean studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhHtfow-CaqrfsEjJMGoLCz5GsQXUwnBMPwIE6SfEZuFFgH0e7ANuyx1oA5BcIHFstG8uJOPKjHskx2_A4QGJLlBzsuQ6lvrbO7WgLwh3xXYp-3_WqIllNyeNymXtXiqUcR0iZk0RRG74u5EQSyNPXNpsex6BmjdIM9A85MVAGnPCxrgRkclW66No-7ccjDd3YOUaPmKk0l8k8QrP2YKdL9ysCckVE27_f3rzMsuR2qf9jrHWnki80malhBWBQc4BefXTlYUfo9Liy" class="" style="">
+</div>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto">
+<!-- Hero Summary Asymmetry -->
+<section class="mb-10">
+<div class="flex flex-col gap-1">
+<span class="text-secondary font-medium tracking-wide text-sm" style="">Welcome back, Arthur</span>
+<h2 class="text-4xl font-extrabold font-manrope tracking-tight text-on-background" style="">Your Health <br>at a glance.</h2>
+</div>
+<div class="mt-8 grid grid-cols-12 gap-4">
+<!-- Dose Progress Ring (Signature Component) -->
+<div class="col-span-12 md:col-span-5 bg-surface-container-lowest rounded-lg p-6 flex flex-col items-center justify-center shadow-sm">
+<div class="relative w-32 h-32 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-surface-container-highest" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="100" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-2xl font-bold font-manrope text-on-surface" style="">02:45</span>
+<span class="text-[10px] uppercase tracking-widest text-outline" style="">Remaining</span>
+</div>
+</div>
+<p class="mt-4 text-sm font-semibold text-primary" style="">Next: Amoxicillin</p>
+</div>
+<!-- Status Bento Item -->
+<div class="col-span-12 md:col-span-7 flex flex-col gap-4">
+<div class="bg-primary-container text-on-primary rounded-lg p-5 flex flex-col justify-between h-full">
+<div>
+<span class="material-symbols-outlined" data-icon="verified" style="font-variation-settings: &quot;FILL&quot; 1;">verified</span>
+<p class="mt-2 text-lg font-manrope font-bold leading-tight" style="">Adherence is 94% this week.</p>
+</div>
+<p class="text-xs opacity-80" style="">You've missed 0 doses in the last 48 hours. Keep it up!</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Alarm List Section -->
+<section class="space-y-6">
+<div class="flex justify-between items-end">
+<h3 class="text-xl font-bold font-manrope text-on-surface" style="">Upcoming Alarms</h3>
+<span class="text-xs font-medium text-outline uppercase tracking-widest" style="">3 scheduled today</span>
+</div>
+<div class="space-y-4">
+<!-- Alarm Card 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg flex items-center justify-between group transition-all duration-300 hover:bg-white shadow-sm border border-transparent hover:border-blue-100">
+<div class="flex items-center gap-5">
+<div class="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="medication" style="">medication</span>
+</div>
+<div>
+<p class="text-2xl font-bold font-manrope text-on-background leading-none mb-1" style="">08:00 <span class="text-sm font-medium text-outline" style="">AM</span></p>
+<p class="text-md font-semibold text-secondary" style="">Amoxicillin</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+<span class="text-[11px] text-outline font-medium" style="">500mg • After Breakfast</span>
+</div>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer tap-highlight-none" style="">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-12 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Alarm Card 2 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg flex items-center justify-between group transition-all duration-300 hover:bg-white shadow-sm border border-transparent hover:border-blue-100">
+<div class="flex items-center gap-5">
+<div class="w-14 h-14 rounded-xl bg-slate-50 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl" data-icon="pill" style="">pill</span>
+</div>
+<div>
+<p class="text-2xl font-bold font-manrope text-on-background leading-none mb-1" style="">12:30 <span class="text-sm font-medium text-outline" style="">PM</span></p>
+<p class="text-md font-semibold text-secondary" style="">Vitamin D3</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+<span class="text-[11px] text-outline font-medium" style="">2000 IU • Daily Booster</span>
+</div>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer tap-highlight-none" style="">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-12 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Alarm Card 3 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg flex items-center justify-between group transition-all duration-300 hover:bg-white shadow-sm border border-transparent hover:border-blue-100">
+<div class="flex items-center gap-5">
+<div class="w-14 h-14 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-3xl" data-icon="vaccines" style="">vaccines</span>
+</div>
+<div class="opacity-60">
+<p class="text-2xl font-bold font-manrope text-on-background leading-none mb-1" style="">09:00 <span class="text-sm font-medium text-outline" style="">PM</span></p>
+<p class="text-md font-semibold text-secondary" style="">Lisinopril</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
+<span class="text-[11px] text-outline font-medium" style="">10mg • Before Bed</span>
+</div>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer tap-highlight-none" style="">
+<input class="sr-only peer" type="checkbox">
+<div class="w-12 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- Tip Card (Editorial Content) -->
+<div class="mt-12 bg-secondary-container/30 rounded-xl p-6 relative overflow-hidden">
+<div class="relative z-10">
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary mb-2 block" style="">Caretaker Insight</span>
+<h4 class="text-lg font-manrope font-bold text-on-secondary-fixed leading-tight mb-2" style="">Consistency is the best medicine.</h4>
+<p class="text-sm text-secondary font-medium leading-relaxed max-w-[200px]" style="">Taking your meds at the same time daily boosts efficacy by 40%.</p>
+</div>
+<div class="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/5 rounded-full blur-2xl"></div>
+<div class="absolute top-4 right-4 text-primary opacity-20">
+<span class="material-symbols-outlined text-6xl" data-icon="lightbulb" style="">lightbulb</span>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-28 right-6 w-16 h-16 bg-primary text-on-primary rounded-full shadow-[0_12px_24px_rgba(0,72,141,0.3)] flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50" style="">
+<span class="material-symbols-outlined text-3xl" data-icon="add" style="">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl z-50 rounded-t-3xl shadow-[0_-8px_24px_rgba(0,0,0,0.04)]">
+<!-- Dashboard (Active) -->
+<a class="flex flex-col items-center justify-center text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-2xl px-5 py-2 active:scale-90 transition-all duration-300 ease-out" href="#" style="">
+<span class="material-symbols-outlined" data-icon="dashboard" style="font-variation-settings: &quot;FILL&quot; 1;">dashboard</span>
+<span class="font-inter text-[11px] font-medium tracking-wide mt-1" style="">Dashboard</span>
+</a>
+<!-- Schedule -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#" style="">
+<span class="material-symbols-outlined" data-icon="event_note" style="">event_note</span>
+<span class="font-inter text-[11px] font-medium tracking-wide mt-1" style="">Schedule</span>
+</a>
+<!-- History -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#" style="">
+<span class="material-symbols-outlined" data-icon="history" style="">history</span>
+<span class="font-inter text-[11px] font-medium tracking-wide mt-1" style="">History</span>
+</a>
+<!-- Settings -->
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 transition-all duration-300 ease-out" href="#" style="">
+<span class="material-symbols-outlined" data-icon="settings" style="">settings</span>
+<span class="font-inter text-[11px] font-medium tracking-wide mt-1" style="">Settings</span>
+</a>
+</nav>
+</body></html>
