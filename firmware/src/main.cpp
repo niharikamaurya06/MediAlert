@@ -531,7 +531,9 @@ void confirmDose(const String& triggerSource) {
 
 void updateConfirmedFlash() {
   if (millis() - confirmedFlashStart >= CONFIRM_FLASH_MS) {
-    // Back to idle — reload reminders
+    // Clear active reminder BEFORE polling so parseRemindersJson
+    // doesn't re-apply the triggered flag to the freshly reset reminder.
+    activeReminder = Reminder();
     systemState = STATE_IDLE;
     pollReminders();
     Serial.println(F("[STATE] → IDLE"));
@@ -543,15 +545,20 @@ void enterMissedState() {
   digitalWrite(PIN_LED_RED, LOW);
 
   String missedTime = getCurrentTimeStr();
+  // Cache medicine name for the display before clearing activeReminder
+  String missedMedicine = activeReminder.medicine;
   patchReminder(false, missedTime);
   postHistory("missed", missedTime, "no_response");
 
   systemState = STATE_MISSED;
-  showMissed(activeReminder.medicine);
-  Serial.printf("[MISSED] %s\n", activeReminder.medicine.c_str());
+  showMissed(missedMedicine);
+  Serial.printf("[MISSED] %s\n", missedMedicine.c_str());
 
   // Brief display then back to idle
   delay(4000);
+  // Clear active reminder BEFORE polling so parseRemindersJson
+  // doesn't re-apply the triggered flag to the freshly reset reminder.
+  activeReminder = Reminder();
   systemState = STATE_IDLE;
   pollReminders();
 }
@@ -701,6 +708,9 @@ void patchReminder(bool taken, const String& takenTime) {
 
   String path = "/rest/v1/reminders?id=eq." + String(activeReminder.id);
 
+  // Only mark the dose result — the app is responsible for resetting
+  // the reminder back to active/pending after the current minute passes.
+  // Doing it immediately here caused the buzzer to re-ring within the same minute.
   DynamicJsonDocument doc(256);
   doc["active"]     = false;
   doc["status"]     = taken ? "taken" : "missed";

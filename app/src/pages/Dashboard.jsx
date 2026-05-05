@@ -8,6 +8,17 @@ import ToggleSwitch from '../components/ToggleSwitch'
 import TopAppBar from '../components/TopAppBar'
 import { deleteReminderById, fetchActiveReminders, fetchHistoryLog, markReminderTaken, supabase } from '../services/supabaseClient'
 
+const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+const dayLabelToKey = {
+  sun: 'sun',
+  mon: 'mon',
+  tue: 'tue',
+  wed: 'wed',
+  thu: 'thu',
+  fri: 'fri',
+  sat: 'sat',
+}
+
 const minutesUntil = (time) => {
   const [hours, minutes] = time.split(':').map(Number)
   const now = new Date()
@@ -41,20 +52,159 @@ const localDate = () => {
   return `${y}-${m}-${d}`
 }
 
+const dateKey = (date) => {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+const parseDateKey = (value) => {
+  const [y, m, d] = value.split('-').map(Number)
+  return new Date(y, m - 1, d)
+}
+
+const withTime = (baseDate, time) => {
+  const [hour, minute] = time.split(':').map(Number)
+  const result = new Date(baseDate)
+  result.setHours(hour, minute, 0, 0)
+  return result
+}
+
+const addDays = (baseDate, amount) => {
+  const next = new Date(baseDate)
+  next.setDate(next.getDate() + amount)
+  return next
+}
+
+const diffMinutes = (target, now) => Math.floor((target.getTime() - now.getTime()) / 60000)
+
+const getReminderRepeat = (reminder) => {
+  const notes = reminder.notes || ''
+  const rawRepeat = String(reminder.repeat_type || reminder.repeat || '').toLowerCase()
+  const daysFromArray = Array.isArray(reminder.days) ? reminder.days.map((day) => String(day).trim().toLowerCase()) : []
+  const customMatch = notes.match(/\[Days:\s*([^\]]+)\]/i)
+  const weeklyFromNotes = /\[Repeat:\s*Weekly\]/i.test(notes)
+
+  if (rawRepeat.includes('custom') || customMatch || daysFromArray.length) {
+    const parsedDays = customMatch
+      ? customMatch[1]
+          .split(',')
+          .map((value) => value.trim().slice(0, 3).toLowerCase())
+          .map((abbr) => dayLabelToKey[abbr])
+          .filter(Boolean)
+      : []
+    const days = Array.from(new Set([...daysFromArray, ...parsedDays]))
+    return { type: 'custom', days }
+  }
+
+  if (rawRepeat.includes('weekly') || weeklyFromNotes) {
+    return { type: 'weekly', days: [] }
+  }
+
+  return { type: 'daily', days: [] }
+}
+
+const getNextOccurrence = ({ reminder, takenDateKeys, now, graceMinutes = 15 }) => {
+  const todayKey = dateKey(now)
+  const todayTaken = takenDateKeys.has(todayKey)
+  const { type, days } = getReminderRepeat(reminder)
+  const todayAtTime = withTime(now, reminder.time)
+  const todayDiff = diffMinutes(todayAtTime, now)
+
+  if (type === 'weekly') {
+    const takenDates = Array.from(takenDateKeys)
+      .map(parseDateKey)
+      .sort((a, b) => a.getTime() - b.getTime())
+    if (takenDates.length) {
+      const lastTaken = takenDates[takenDates.length - 1]
+      let candidate = withTime(addDays(lastTaken, 7), reminder.time)
+      while (candidate < now) {
+        candidate = addDays(candidate, 7)
+      }
+      return candidate
+    }
+    if (todayDiff < -graceMinutes) {
+      return addDays(todayAtTime, 7)
+    }
+    return todayAtTime
+  }
+
+  if (type === 'custom' && days.length) {
+    for (let offset = 0; offset < 14; offset += 1) {
+      const candidateDate = addDays(now, offset)
+      const candidateKey = dateKey(candidateDate)
+      const candidateDay = dayKeys[candidateDate.getDay()]
+      if (!days.includes(candidateDay)) {
+        continue
+      }
+      if (takenDateKeys.has(candidateKey)) {
+        continue
+      }
+      const candidate = withTime(candidateDate, reminder.time)
+      if (offset === 0 && diffMinutes(candidate, now) < -graceMinutes) {
+        continue
+      }
+      return candidate
+    }
+  }
+
+  if (todayTaken || todayDiff < -graceMinutes) {
+    return addDays(todayAtTime, 1)
+  }
+  return todayAtTime
+}
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const [reminders, setReminders] = useState([])
   const [history, setHistory] = useState([])
   const [remainingText, setRemainingText] = useState('--:--')
   const [isSaving, setIsSaving] = useState(false)
+  const today = localDate()
+  const takenDateMap = useMemo(() => {
+    const map = new Map()
+    history
+      .filter((entry) => entry.status === 'taken')
+      .forEach((entry) => {
+        const key = `${entry.medicine}-${entry.scheduled_time}`
+        if (!map.has(key)) {
+          map.set(key, new Set())
+        }
+        map.get(key).add(entry.date)
+      })
+    return map
+  }, [history])
+  const takenToday = useMemo(
+    () =>
+      new Set(
+        history
+          .filter((entry) => entry.date === today && entry.status === 'taken')
+          .map((entry) => `${entry.medicine}-${entry.scheduled_time}`),
+      ),
+    [history, today],
+  )
+  const upcomingReminders = useMemo(
+    () =>
+      reminders
+        .map((reminder) => {
+          const key = `${reminder.medicine}-${reminder.time}`
+          const takenDateKeys = takenDateMap.get(key) ?? new Set()
+          const nextOccurrence = getNextOccurrence({ reminder, takenDateKeys, now: new Date() })
+          return { reminder, nextOccurrence }
+        })
+        .sort((a, b) => a.nextOccurrence.getTime() - b.nextOccurrence.getTime()),
+    [reminders, takenDateMap],
+  )
 
   const nextDose = useMemo(() => {
-    if (!reminders.length) {
+    if (!upcomingReminders.length) {
       return null
     }
 
-    return [...reminders].sort((a, b) => minutesUntil(a.time) - minutesUntil(b.time))[0]
-  }, [reminders])
+    return upcomingReminders[0].reminder
+  }, [upcomingReminders])
+  const nextDoseAt = useMemo(() => (upcomingReminders.length ? upcomingReminders[0].nextOccurrence : null), [upcomingReminders])
 
   const adherence = useMemo(() => {
     const sevenDaysAgo = new Date()
@@ -80,42 +230,7 @@ export default function Dashboard() {
     const channel = supabase
       .channel('medialert-live-dashboard')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'reminders' }, loadData)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'history' }, async (payload) => {
-        loadData()
-        
-        // Removed condition for debugging: ALWAYS trigger navigation on INSERT
-        try {
-          const { data: activeReminders } = await supabase
-            .from('reminders')
-            .select('*')
-            .eq('active', true)
-            .order('time', { ascending: true })
-          
-          const next = activeReminders && activeReminders.length ? activeReminders[0] : null
-          
-          const { data: todayHistory } = await supabase
-            .from('history')
-            .select('*')
-            .eq('date', payload.new?.date || localDate())
-            .eq('status', 'taken')
-            
-          const currentTakenCount = new Set((todayHistory || []).map((entry) => `${entry.medicine}-${entry.scheduled_time}`)).size
-          const totalReminders = (activeReminders?.length || 0) + currentTakenCount
-          const progress = totalReminders > 0 ? Math.min(100, Math.round((currentTakenCount / totalReminders) * 100)) : 0
-
-          navigate('/taken', {
-            state: {
-              medicine: payload.new?.medicine || 'Unknown',
-              takenTime: payload.new?.taken_time || '--:--',
-              nextDose: next?.time ?? '--:--',
-              progress,
-              autoClose: true,
-            },
-          })
-        } catch (e) {
-          console.error("Navigation error:", e)
-        }
-      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'history' }, loadData)
       .subscribe()
 
     return () => {
@@ -131,7 +246,7 @@ export default function Dashboard() {
     }
 
     const updateRemaining = () => {
-      let remainingMinutes = minutesUntil(nextDose.time)
+      let remainingMinutes = nextDoseAt ? diffMinutes(nextDoseAt, new Date()) : minutesUntil(nextDose.time)
       if (remainingMinutes < 0) remainingMinutes = 0
       const hours = Math.floor(remainingMinutes / 60)
       const minutes = remainingMinutes % 60
@@ -141,7 +256,7 @@ export default function Dashboard() {
     updateRemaining()
     const timer = setInterval(updateRemaining, 30000)
     return () => clearInterval(timer)
-  }, [nextDose])
+  }, [nextDose, nextDoseAt])
 
   const handleMarkTaken = async (reminder) => {
     setIsSaving(true)
@@ -156,10 +271,10 @@ export default function Dashboard() {
         scheduledTime: reminder.time,
         takenTime,
         date,
-        trigger: 'app_button',
+        trigger: 'button',
       })
 
-      const next = reminders.length ? [...reminders].sort((a, b) => minutesUntil(a.time) - minutesUntil(b.time))[0] : null
+      const next = upcomingReminders.find((item) => item.reminder.id !== reminder.id)?.reminder ?? null
       const todayEntries = history.filter((entry) => entry.date === date && entry.status === 'taken')
       const currentTakenCount = new Set(todayEntries.map((entry) => `${entry.medicine}-${entry.scheduled_time}`)).size
       const progress = reminders.length ? Math.min(100, Math.round(((currentTakenCount + 1) / reminders.length) * 100)) : 0
@@ -192,16 +307,10 @@ export default function Dashboard() {
     }
   }
 
-  const remainingMinutes = nextDose ? minutesUntil(nextDose.time) : 0
-  const ringProgress = nextDose ? Math.round(((1440 - remainingMinutes) / 1440) * 100) : 0
+  const remainingMinutes = nextDoseAt ? Math.max(0, diffMinutes(nextDoseAt, new Date())) : 0
+  const clampedRemaining = Math.min(1440, remainingMinutes)
+  const ringProgress = nextDoseAt ? Math.round(((1440 - clampedRemaining) / 1440) * 100) : 0
   const missed = history.filter((entry) => entry.status === 'missed').length
-  const today = localDate()
-  const takenToday = new Set(
-    history
-      .filter((entry) => entry.date === today && entry.status === 'taken')
-      .map((entry) => `${entry.medicine}-${entry.scheduled_time}`),
-  )
-
   return (
     <div className="min-h-screen bg-slate-100 pb-32">
       <TopAppBar showProfile />
@@ -225,14 +334,14 @@ export default function Dashboard() {
 
         <div className="mb-3 flex items-end justify-between">
           <h2 className="text-2xl font-bold text-slate-900">Upcoming Alarms</h2>
-          <span className="text-[11px] uppercase tracking-[0.15em] text-slate-500">{reminders.length} scheduled today</span>
+          <span className="text-[11px] uppercase tracking-[0.15em] text-slate-500">{upcomingReminders.length} upcoming</span>
         </div>
 
         <div className="space-y-3">
-          {!reminders.length ? (
+          {!upcomingReminders.length ? (
             <Card className="px-4 py-5 text-center text-slate-500">No active reminders available.</Card>
           ) : (
-            reminders.map((reminder) => {
+            upcomingReminders.map(({ reminder }) => {
               const { label, period } = formatHour(reminder.time)
               return (
                 <Card key={reminder.id} className="px-4 py-4">

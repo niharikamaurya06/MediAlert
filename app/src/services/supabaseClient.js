@@ -110,4 +110,16 @@ export const markReminderTaken = async ({ reminderId, medicine, scheduledTime, t
     if (historyError) {
         throw historyError
     }
+
+    // Defer reset to active/pending until the next minute boundary (+ 2 s buffer).
+    // Resetting immediately causes the firmware to re-fetch the reminder while the
+    // clock still shows the scheduled minute and ring the buzzer a second time.
+    const now = new Date()
+    const msUntilReset = (60 - now.getSeconds()) * 1000 - now.getMilliseconds() + 2000
+    setTimeout(async () => {
+        await supabase
+            .from('reminders')
+            .update({ active: true, status: 'pending', taken_time: null })
+            .eq('id', reminderId)
+    }, msUntilReset)
 }
