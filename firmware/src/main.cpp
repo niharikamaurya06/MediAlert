@@ -20,16 +20,17 @@
 #include <Adafruit_SSD1306.h>
 #include <RTClib.h>
 #include <time.h>
+#include "secrets.h"  // gitignored — copy secrets.h.template → secrets.h and fill in values
 
 // ─── WiFi ───────────────────────────────────────────────────────────────────
-const char* WIFI_SSID     = "niharika";
-const char* WIFI_PASSWORD = "8369238193";
+const char* WIFI_SSID     = WIFI_SSID_SECRET;
+const char* WIFI_PASSWORD = WIFI_PASSWORD_SECRET;
 
 // ─── Supabase ───────────────────────────────────────────────────────────────
-const char* SUPABASE_HOST   = "kjddxczpwgxzyachmyvc.supabase.co";
-const char* SUPABASE_URL    = "https://kjddxczpwgxzyachmyvc.supabase.co";
-const char* SUPABASE_KEY    = "sb_publishable_aInpE8f09L4eWLuVEbEqHA_fJjDbCnW";
-const char* WS_PATH         = "/realtime/v1/websocket?apikey=sb_publishable_aInpE8f09L4eWLuVEbEqHA_fJjDbCnW&vsn=1.0.0";
+const char* SUPABASE_HOST   = SUPABASE_HOST_SECRET;
+const char* SUPABASE_URL    = SUPABASE_URL_SECRET;
+const char* SUPABASE_KEY    = SUPABASE_KEY_SECRET;
+const char* WS_PATH         = WS_PATH_SECRET;
 
 // ─── Pins ───────────────────────────────────────────────────────────────────
 #define PIN_BUZZER      25
